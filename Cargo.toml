@@ -1,0 +1,10 @@
+[package]
+name = "cal-pic"
+version = "0.1.0"
+authors = [
+    "Sagar Adhikari <sagara@g.clemson.edu>",
+    "Jonathan Zrake <jzrake@clemson.edu>"
+]
+edition = "2018"
+
+[dependencies]
