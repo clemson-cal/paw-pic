@@ -1,8 +1,5 @@
-use std::ops::{Add, Sub, Mul, Div};
 use crate::three_vector::ThreeVector;
-
-
-
+use std::ops::{Add, Div, Mul, Sub};
 
 /**
  * Describes a relativistic four-momentum vector
@@ -10,12 +7,8 @@ use crate::three_vector::ThreeVector;
 #[derive(Clone)]
 pub struct FourMomentum(pub f64, pub f64, pub f64, pub f64);
 
-
-
-
 // ============================================================================
 impl FourMomentum {
-
     pub fn contract(&self, b: &FourMomentum) -> f64 {
         let p = self;
         -p.0 * b.0 + p.1 * b.1 + p.2 * b.2 + p.3 * b.3
@@ -39,9 +32,6 @@ impl FourMomentum {
     }
 }
 
-
-
-
 // ============================================================================
 impl Add<FourMomentum> for FourMomentum {
     type Output = FourMomentum;
@@ -60,23 +50,13 @@ impl Sub<FourMomentum> for FourMomentum {
 impl Mul<f64> for FourMomentum {
     type Output = FourMomentum;
     fn mul(self, b: f64) -> FourMomentum {
-        FourMomentum(
-            self.0 * b,
-            self.1 * b,
-            self.2 * b,
-            self.3 * b,
-        )
+        FourMomentum(self.0 * b, self.1 * b, self.2 * b, self.3 * b)
     }
 }
 
 impl Div<f64> for FourMomentum {
     type Output = FourMomentum;
     fn div(self, b: f64) -> FourMomentum {
-        FourMomentum(
-            self.0 / b,
-            self.1 / b,
-            self.2 / b,
-            self.3 / b,
-        )
+        FourMomentum(self.0 / b, self.1 / b, self.2 / b, self.3 / b)
     }
 }

@@ -1,7 +1,4 @@
-use std::ops::{Add, Sub, Mul, Div};
-
-
-
+use std::ops::{Add, Div, Mul, Sub};
 
 /**
  * Describes a three-dimensional vector
@@ -9,12 +6,8 @@ use std::ops::{Add, Sub, Mul, Div};
 #[derive(Clone, Copy)]
 pub struct ThreeVector(pub f64, pub f64, pub f64);
 
-
-
-
 // ============================================================================
 impl ThreeVector {
-
     pub fn cross(&self, b: &ThreeVector) -> Self {
         ThreeVector(
             self.1 * b.2 - self.2 * b.1,
@@ -44,9 +37,6 @@ impl ThreeVector {
     }
 }
 
-
-
-
 // ============================================================================
 impl Add<ThreeVector> for ThreeVector {
     type Output = ThreeVector;
@@ -65,21 +55,13 @@ impl Sub<ThreeVector> for ThreeVector {
 impl Mul<f64> for ThreeVector {
     type Output = ThreeVector;
     fn mul(self, b: f64) -> ThreeVector {
-        ThreeVector(
-            self.0 * b,
-            self.1 * b,
-            self.2 * b,
-        )
+        ThreeVector(self.0 * b, self.1 * b, self.2 * b)
     }
 }
 
 impl Div<f64> for ThreeVector {
     type Output = ThreeVector;
     fn div(self, b: f64) -> ThreeVector {
-        ThreeVector(
-            self.0 / b,
-            self.1 / b,
-            self.2 / b,
-        )
+        ThreeVector(self.0 / b, self.1 / b, self.2 / b)
     }
 }
