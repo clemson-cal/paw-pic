@@ -9,6 +9,11 @@ pub struct FourMomentum(pub f64, pub f64, pub f64, pub f64);
 
 // ============================================================================
 impl FourMomentum {
+    pub fn from_mass_and_velocity(mass: f64, v: ThreeVector) -> Self {
+        let gamma = 1.0 / (1.0 - v.squared()).sqrt();
+        Self(1.0, v.0, v.1, v.2) * (gamma * mass)
+    }
+
     pub fn contract(&self, b: &FourMomentum) -> f64 {
         let p = self;
         -p.0 * b.0 + p.1 * b.1 + p.2 * b.2 + p.3 * b.3
@@ -58,5 +63,20 @@ impl Div<f64> for FourMomentum {
     type Output = FourMomentum;
     fn div(self, b: f64) -> FourMomentum {
         FourMomentum(self.0 / b, self.1 / b, self.2 / b, self.3 / b)
+    }
+}
+
+// ============================================================================
+#[cfg(test)]
+mod test {
+
+    use crate::four_momentum::FourMomentum;
+    use crate::three_vector::ThreeVector;
+
+    #[test]
+    fn four_momentum_has_expected_mass() {
+        let p = FourMomentum::from_mass_and_velocity(1.0, ThreeVector(0.5, 0.0, 0.0));
+        let m = p.rest_mass();
+        assert_eq!(m, 1.0);
     }
 }

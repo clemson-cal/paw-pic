@@ -5,7 +5,7 @@ use crate::three_vector::ThreeVector;
  * Describes a relativistic charged particle
  */
 #[derive(Clone)]
-struct ChargedParticle {
+pub struct ChargedParticle {
     pub charge: f64,
     pub position: ThreeVector,
     pub momentum: FourMomentum,
@@ -43,44 +43,81 @@ impl ChargedParticle {
     /*
      * Move the particle forward in time using rk4 push method.
      */
-    pub fn rk4_push(&self, electric: ThreeVector, magnetic: ThreeVector, dt: f64) -> Self {
+    pub fn rk4_push<F>(&self, field: F, time: f64, dt: f64) -> Self
+    where
+        F: Fn(ThreeVector, f64) -> (ThreeVector, ThreeVector),
+    {
         let e = self.charge;
         let m = self.momentum.rest_mass();
-        let h = e / m * dt;
+
+        let deltas = |x: ThreeVector, u: ThreeVector, t: f64| -> (ThreeVector, ThreeVector, f64) {
+            let (electric, magnetic) = field(x, t);
+            let v = u / (1.0 + u.squared()).sqrt();
+            let dxdt = v;
+            let dudt = (electric + v.cross(&magnetic)) * (e / m);
+            (dxdt * dt, dudt * dt, dt)
+        };
+
+        let t0 = time;
+        let x0 = self.position;
         let u0 = self.momentum.gamma_beta_vector();
 
-        let dxdt_0 = self.momentum.velocity_vector();
-        let dudt_0 = (electric + u0.cross(&magnetic) / self.momentum.lorentz_factor()) * (e / m);
+        let (dx0, du0, dt0) = deltas(x0, u0, t0);
+        let x1 = x0 + dx0 * 0.5;
+        let u1 = u0 + du0 * 0.5;
+        let t1 = t0 + dt0 * 0.5;
 
-        let x_one = self.position + dxdt_0 * dt * 0.5;
-        let u_one = self.position + dudt_0 * dt * 0.5;
-        let p_one = FourMomentum(self.momentum.0, u_one.0, u_one.1, u_one.2);
+        let (dx1, du1, dt1) = deltas(x1, u1, t1);
+        let x2 = x1 + dx1 * 0.5;
+        let u2 = u1 + du1 * 0.5;
+        let t2 = t1 + dt1 * 0.5;
 
-        let dxdt_1 = u_one / p_one.lorentz_factor();
-        let dudt_1 = (electric + u_one.cross(&magnetic) / p_one.lorentz_factor()) * (e / m);
+        let (dx2, du2, dt2) = deltas(x2, u2, t2);
+        let x3 = x2 + dx2;
+        let u3 = u2 + du2;
+        let t3 = t2 + dt2;
 
-        let x_two = self.position + dxdt_1 * dt * 0.5;
-        let u_two = self.position + dudt_1 * dt * 0.5;
-        let p_two = FourMomentum(self.momentum.0, u_two.0, u_two.1, u_two.2);
+        let (dx3, du3, dt3) = deltas(x3, u3, t3);
 
-        let dxdt_2 = u_two / p_two.lorentz_factor();
-        let dudt_2 = (electric + u_two.cross(&magnetic) / p_two.lorentz_factor()) * (e / m);
-
-        let x_three = self.position + dxdt_2 * dt;
-        let u_three = self.position + dudt_2 * dt;
-        let p_three = FourMomentum(self.momentum.0, u_three.0, u_three.1, u_three.2);
-
-        let dxdt_3 = u_three / p_three.lorentz_factor();
-        let dudt_3 = (electric + u_three.cross(&magnetic) / p_three.lorentz_factor()) * (e / m);
-
-        let new_pos = self.position + (dxdt_0 + (dxdt_1 + dxdt_2) * 2.0 + dxdt_3) * (dt / 6.0);
-        let new_u = u0 + (dudt_0 + (dudt_1 + dudt_2) * 2.0 + dudt_3) * (dt / 6.0);
-        let new_mom = FourMomentum(self.momentum.0, new_u.0, new_u.1, new_u.2);
+        let x = x0 + (dx0 + dx1 * 2.0 + dx2 * 2.0 + dx3) / 6.0;
+        let u = u0 + (du0 + du1 * 2.0 + du2 * 2.0 + du3) / 6.0;
+        let t = t0 + (dt0 + dt1 * 2.0 + dt2 * 2.0 + dt3) / 6.0;
+        let p = FourMomentum((1.0 + u.squared()).sqrt(), u.0, u.1, u.2) * m;
 
         ChargedParticle {
             charge: e,
-            position: new_pos,
-            momentum: new_mom,
+            position: x,
+            momentum: p,
         }
+    }
+}
+
+// ============================================================================
+#[cfg(test)]
+mod test {
+
+    use crate::charged_particle::ChargedParticle;
+    use crate::four_momentum::FourMomentum;
+    use crate::three_vector::ThreeVector;
+
+    #[test]
+    fn rk4_push_works_with_zero_fields() {
+        let particle = ChargedParticle {
+            charge: 1.0,
+            position: ThreeVector(0.0, 0.0, 0.0),
+            momentum: FourMomentum::from_mass_and_velocity(1.0, ThreeVector(0.5, 0.0, 0.0)),
+        };
+
+        let field = |_, _| {
+            let e = ThreeVector(0.0, 0.0, 0.0);
+            let b = ThreeVector(0.0, 0.0, 0.0);
+            (e, b)
+        };
+
+        let p1 = particle.rk4_push(field, 0.0, 0.1);
+
+        approx::assert_relative_eq!(p1.position.0, 0.05, epsilon = 1e-12);
+        approx::assert_relative_eq!(p1.momentum.0, particle.momentum.0, epsilon = 1e-12);
+        approx::assert_relative_eq!(p1.momentum.1, particle.momentum.1, epsilon = 1e-12);
     }
 }
