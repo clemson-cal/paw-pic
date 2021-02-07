@@ -8,3 +8,4 @@ authors = [
 edition = "2018"
 
 [dependencies]
+approx = "0.4.0"
