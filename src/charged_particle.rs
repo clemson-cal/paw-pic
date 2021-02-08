@@ -13,13 +13,18 @@ pub struct ChargedParticle {
 
 // ============================================================================
 impl ChargedParticle {
+
     /**
-     * Move the particle forward in time using the classic "Boris Push" method.
+     * Return the total particle energy, rest mass plus kinetic.
      */
     pub fn total_energy(&self) -> f64 {
         let p = &self.momentum;
         p.rest_mass() * p.lorentz_factor()
     }
+
+    /**
+     * Move the particle forward in time using the classic "Boris Push" method.
+     */
     pub fn boris_push(&self, electric: ThreeVector, magnetic: ThreeVector, dt: f64) -> Self {
         let e = self.charge;
         let m = self.momentum.rest_mass();
