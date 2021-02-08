@@ -25,7 +25,7 @@ impl FourMomentum {
 
     pub fn lorentz_factor(&self) -> f64 {
         let u = self.gamma_beta_vector().norm();
-        u / (1.0 + u * u).sqrt()
+        (1.0 + u * u).sqrt()
     }
 
     pub fn gamma_beta_vector(&self) -> ThreeVector {
