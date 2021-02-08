@@ -18,8 +18,7 @@ impl ChargedParticle {
      * Return the total particle energy, rest mass plus kinetic.
      */
     pub fn total_energy(&self) -> f64 {
-        let p = &self.momentum;
-        p.rest_mass() * p.lorentz_factor()
+        self.momentum.0
     }
 
     /**
