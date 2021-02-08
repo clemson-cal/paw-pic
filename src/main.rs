@@ -26,17 +26,30 @@ fn main() {
         (e, b)
     };
 
+    let save_particle_vec = |solution: &Vec<ChargedParticle>| {
+        let mut file = File::create("solution.dat").expect("error creating");
+        for element in solution {
+            let x = element.position.0;
+            let y = element.position.1;
+            let z = element.position.2;
+            writeln!(&mut file, "{} {} {}", x, y, z);
+        }
+    };
+    let mut solution = vec![];
     //let e = ThreeVector(0.0, 0.2, 0.0);
     //let b = ThreeVector(0.0, 0.0, 1.0);
-    //let mut file = File::create("solution.dat").expect("error creating");
+    //
     while time < 16.0 {
         particle = particle.rk4_push(field, time, dt);
-        println!(
-            "{} {} {} {}",
-            time, particle.position.0, particle.position.1, particle.position.2
-        );
-        //file.write_all("{} {} {}", time, particle.position.0, particle.position.1).expect("error writing");
+        //      println!(
+        //          "{} {} {} {}",
+        //          time, particle.position.0, particle.position.1, particle.position.2
+        //      );
+
+        solution.push(particle.clone());
 
         time += dt;
     }
+    //println!("{:?}", solution);
+    save_particle_vec(&solution);
 }

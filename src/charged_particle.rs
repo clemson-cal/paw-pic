@@ -4,7 +4,7 @@ use crate::three_vector::ThreeVector;
 /**
  * Describes a relativistic charged particle
  */
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct ChargedParticle {
     pub charge: f64,
     pub position: ThreeVector,

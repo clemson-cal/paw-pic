@@ -4,7 +4,7 @@ use std::ops::{Add, Div, Mul, Sub};
 /**
  * Describes a relativistic four-momentum vector
  */
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct FourMomentum(pub f64, pub f64, pub f64, pub f64);
 
 // ============================================================================

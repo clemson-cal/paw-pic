@@ -3,7 +3,7 @@ use std::ops::{Add, Div, Mul, Sub};
 /**
  * Describes a three-dimensional vector
  */
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct ThreeVector(pub f64, pub f64, pub f64);
 
 // ============================================================================
