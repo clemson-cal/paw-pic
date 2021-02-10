@@ -21,12 +21,12 @@ fn main() {
     let dt: f64 = 0.01;
 
     /*let field = |_, _| {
-        let e = ThreeVector(0.0, 0.1, 0.0);
+        let e = ThreeVector(0.0, 1.0, 0.0);
         let b = ThreeVector(0.0, 0.0, 1.0);
         (e, b)
     };*/
 
-    let e = ThreeVector(0.0, 0.0, 0.0);
+    let e = ThreeVector(0.0, 1.0, 0.0);
     let b = ThreeVector(0.0, 0.0, 1.0);
     let ebyb = e.1 / b.2;
 
@@ -44,7 +44,7 @@ fn main() {
         ]
         .concat();
         let energyfilename = [
-            String::from("../solution/energy_"),
+            String::from("../solution/energypowerlaw_"),
             ebyb.to_string(),
             String::from(".dat"),
         ]
@@ -75,7 +75,7 @@ fn main() {
     };
     let mut solution = Vec::new();
 
-    while time < 37.0 {
+    while time < 150.0 {
         particle = particle.boris_push(e, b, dt);
         //particle = particle.rk4_push(field, time, dt);
         solution.push((time, particle.clone()));
